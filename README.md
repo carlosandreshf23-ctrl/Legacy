@@ -2,7 +2,7 @@
 
 Videojuego histórico narrativo, multijugador (1-4) y generacional ambientado en Perú entre 1820-1920. Plataforma principal: móvil, con expansión posterior a PC. DLC futuro planeado: **LEGADO: PARADOJA** (no en desarrollo todavía).
 
-Este repositorio se desarrolla por **fases funcionales** (vertical slices): cada fase produce una versión jugable, verificable y ampliable antes de avanzar a la siguiente. Ver `docs/DevelopmentRoadmap.md` para el detalle completo y el estado actual.
+Este repositorio se desarrolla por **fases funcionales** (vertical slices): cada fase produce una versión jugable, verificable y ampliable antes de avanzar a la siguiente. Ver `docs/12_DEVELOPMENT_ROADMAP.md` para el detalle completo y el estado actual.
 
 ## Estado del proyecto
 
@@ -12,12 +12,19 @@ Este repositorio se desarrolla por **fases funcionales** (vertical slices): cada
 
 | Documento | Contenido |
 |---|---|
-| [`docs/Architecture.md`](docs/Architecture.md) | Motor/stack elegido, principios de arquitectura, estructura de carpetas, capas del sistema |
-| [`docs/GameSystems.md`](docs/GameSystems.md) | Catálogo de sistemas de juego, responsabilidades y dependencias |
-| [`docs/DataModel.md`](docs/DataModel.md) | Modelo de datos de las entidades centrales del juego |
-| [`docs/SaveSystem.md`](docs/SaveSystem.md) | Diseño del sistema de guardado (local + mundo persistente compartido) |
-| [`docs/MultiplayerArchitecture.md`](docs/MultiplayerArchitecture.md) | Modelo multijugador asíncrono + sesión en tiempo real |
-| [`docs/DevelopmentRoadmap.md`](docs/DevelopmentRoadmap.md) | Roadmap completo de fases, protocolo de trabajo y reglas de progresión |
+| [`docs/01_ARCHITECTURE.md`](docs/01_ARCHITECTURE.md) | Motor/stack elegido, capas del sistema, principios data-driven, identificadores persistentes, debug/testing/localización |
+| [`docs/02_SYSTEMS_MAP.md`](docs/02_SYSTEMS_MAP.md) | Catálogo de sistemas, mapa de dependencias completo, clasificación de prioridades P0-P3 |
+| [`docs/03_DATA_MODEL.md`](docs/03_DATA_MODEL.md) | Entidades principales: personajes, genealogía relacional, decisiones, patrimonio, NPC, crimen, información, transporte, misiones |
+| [`docs/04_WORLD_ARCHITECTURE.md`](docs/04_WORLD_ARCHITECTURE.md) | Regiones/subregiones/locations, streaming, `TemporalWorldState` por capas |
+| [`docs/05_TIME_SYSTEM.md`](docs/05_TIME_SYSTEM.md) | `GameCalendarSystem`, sincronía con la historia, solución al problema de tiempo en multijugador |
+| [`docs/06_FAMILY_SYSTEM.md`](docs/06_FAMILY_SYSTEM.md) | `FamilySystem`, `CharacterDefinition` vs `CharacterInstance`, genealogía relacional entre familias |
+| [`docs/07_CONSEQUENCE_SYSTEM.md`](docs/07_CONSEQUENCE_SYSTEM.md) | `DecisionSystem`, `ConsequenceEngine`, `QuestGraph`, mecanismos anti explosión combinatoria |
+| [`docs/08_SAVE_SYSTEM.md`](docs/08_SAVE_SYSTEM.md) | Persistencia: snapshots + event log, versionado y migraciones |
+| [`docs/09_MULTIPLAYER_ARCHITECTURE.md`](docs/09_MULTIPLAYER_ARCHITECTURE.md) | Modelo de autoridad de red, jugadores en zonas distintas, propiedad de campaña |
+| [`docs/10_MOBILE_PERFORMANCE.md`](docs/10_MOBILE_PERFORMANCE.md) | Presupuestos de rendimiento por tier de dispositivo (LOW/MID/HIGH) |
+| [`docs/11_HISTORICAL_DATA_PIPELINE.md`](docs/11_HISTORICAL_DATA_PIPELINE.md) | Pipeline de datos históricos, tipos de NPC, clasificación de contenido sensible |
+| [`docs/12_DEVELOPMENT_ROADMAP.md`](docs/12_DEVELOPMENT_ROADMAP.md) | Roadmap de fases, herramientas internas, estrategia de testing, especificación del vertical slice Paracas 1820 |
+| [`docs/13_TECHNICAL_RISKS.md`](docs/13_TECHNICAL_RISKS.md) | Riesgos técnicos con probabilidad, impacto y mitigación |
 
 ## Estructura del repositorio
 
@@ -36,4 +43,4 @@ tools/           Herramientas de soporte (validación de datos, CI)
 - Código y datos históricos están estrictamente separados.
 - El multijugador y la extensibilidad hacia Paradoja se consideran desde la arquitectura base, no se añaden al final.
 
-Detalle completo de reglas en `docs/DevelopmentRoadmap.md`.
+Detalle completo de reglas en `docs/12_DEVELOPMENT_ROADMAP.md`.
