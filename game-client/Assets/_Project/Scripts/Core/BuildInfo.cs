@@ -7,10 +7,10 @@ namespace LegadoPeru.Core
     /// </summary>
     public static class BuildInfo
     {
-        public const string Version = "0.2.1-dev";
-        public const int BuildNumber = 9;
+        public const string Version = "0.2.2-dev";
+        public const int BuildNumber = 10;
         public const string Phase = "Fase 2 — Primer Vertical Slice Visual";
-        public const string Milestone = "Milestone 2.1 — Look & Feel";
+        public const string Milestone = "Milestone 2.1 — Look & Feel (iteración de fidelidad visual)";
 
         public static string DisplayString => $"LEGADO: PERÚ — build {Version} ({BuildNumber}) — {Phase} — {Milestone}";
     }

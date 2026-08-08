@@ -54,12 +54,21 @@ PALETTE = {
     "trunk": (96, 66, 44, 255),
     "skin_mateo": (206, 158, 118, 255),
     "skin_mateo_shadow": (178, 130, 92, 255),
+    "skin_mateo_highlight": (222, 178, 140, 255),
     "hair_mateo": (54, 38, 28, 255),
+    "hair_mateo_highlight": (78, 56, 40, 255),
     "shirt_mateo": (224, 214, 188, 255),
     "shirt_mateo_shadow": (196, 182, 150, 255),
+    "shirt_mateo_highlight": (240, 232, 210, 255),
     "trouser_mateo": (120, 92, 60, 255),
     "trouser_mateo_shadow": (96, 72, 46, 255),
     "sandal": (90, 62, 40, 255),
+    "sash_mateo": (168, 78, 46, 255),
+    "sash_mateo_shadow": (136, 58, 32, 255),
+    "satchel_strap": (86, 56, 34, 255),
+    "satchel_bag": (112, 76, 46, 255),
+    "satchel_bag_shadow": (86, 56, 34, 255),
+    "family_seal": (196, 158, 74, 255),
     "skin_npc": (188, 140, 100, 255),
     "skin_npc_shadow": (160, 114, 78, 255),
     "hair_npc": (196, 196, 196, 255),
@@ -85,6 +94,16 @@ def rect(img, x0, y0, x1, y1, color):
     for y in range(y0, y1 + 1):
         for x in range(x0, x1 + 1):
             px(img, x, y, color)
+
+
+def dither_band(img, x0, y0, x1, y1, color_a, color_b):
+    """Franja con mezcla de dos tonos en patron de tablero (ordered dithering, 2 colores).
+    Suaviza una transicion sombra/base sin salir de una paleta plana — tecnica clasica de
+    'pixel art moderno' (Eastward/Stardew Valley) frente al bloque de 2 tonos duro de GBA
+    temprano. Ver ART_BIBLE_v0.1.md — decision de fidelidad de personaje."""
+    for y in range(y0, y1 + 1):
+        for x in range(x0, x1 + 1):
+            px(img, x, y, color_a if (x + y) % 2 == 0 else color_b)
 
 
 def outline_silhouette(img, color):
@@ -237,6 +256,45 @@ def prop_fence_post(size=16):
 
 
 # ---------------------------------------------------------------------------
+# Iconos de detalle de item (para la hoja de diseño, prompt de referencia del
+# usuario: "ITEMES/DETAIL" callouts). Objetos pequeños en canvas 24x24.
+# ---------------------------------------------------------------------------
+
+def icon_satchel(size=24):
+    img = new_canvas(size, size)
+    s = size / 24.0
+    rect(img, int(4 * s), int(10 * s), int(19 * s), int(20 * s), PALETTE["satchel_bag"])
+    rect(img, int(4 * s), int(10 * s), int(19 * s), int(12 * s), PALETTE["satchel_bag_shadow"])
+    rect(img, int(6 * s), int(4 * s), int(17 * s), int(6 * s), PALETTE["satchel_strap"])
+    rect(img, int(10 * s), int(14 * s), int(13 * s), int(16 * s), PALETTE["family_seal"])
+    return outline_silhouette(img, PALETTE["outline"])
+
+
+def icon_sash(size=24):
+    img = new_canvas(size, size)
+    s = size / 24.0
+    rect(img, int(2 * s), int(9 * s), int(21 * s), int(15 * s), PALETTE["sash_mateo"])
+    rect(img, int(2 * s), int(14 * s), int(21 * s), int(15 * s), PALETTE["sash_mateo_shadow"])
+    rect(img, int(9 * s), int(9 * s), int(14 * s), int(15 * s), PALETTE["adobe_trim"])
+    return outline_silhouette(img, PALETTE["outline"])
+
+
+def icon_family_seal(size=24):
+    img = new_canvas(size, size)
+    s = size / 24.0
+    cx = cy = size // 2
+    r = int(9 * s)
+    for y in range(size):
+        for x in range(size):
+            d2 = (x - cx) ** 2 + (y - cy) ** 2
+            if d2 <= r * r:
+                px(img, x, y, PALETTE["family_seal"])
+            if d2 <= (r - int(2 * s)) ** 2:
+                px(img, x, y, PALETTE["sash_mateo_shadow"] if (x + y) % 6 == 0 else PALETTE["family_seal"])
+    return outline_silhouette(img, PALETTE["outline"])
+
+
+# ---------------------------------------------------------------------------
 # Personajes. Canvas base 16x24 (1 tile de ancho x 1.5 tiles de alto, ver
 # ART_BIBLE_v0.1.md §2). draw_character() es parametrico para poder producir
 # tanto a Mateo como a un NPC con siluetas/paletas claramente distintas
@@ -245,11 +303,17 @@ def prop_fence_post(size=16):
 
 MATEO_SPEC = dict(
     skin=PALETTE["skin_mateo"], skin_shadow=PALETTE["skin_mateo_shadow"],
-    hair=PALETTE["hair_mateo"],
+    skin_highlight=PALETTE["skin_mateo_highlight"],
+    hair=PALETTE["hair_mateo"], hair_highlight=PALETTE["hair_mateo_highlight"],
     shirt=PALETTE["shirt_mateo"], shirt_shadow=PALETTE["shirt_mateo_shadow"],
+    shirt_highlight=PALETTE["shirt_mateo_highlight"],
     trouser=PALETTE["trouser_mateo"], trouser_shadow=PALETTE["trouser_mateo_shadow"],
     sandal=PALETTE["sandal"], hat=None, apron=None, hair_style="short",
+    sash=PALETTE["sash_mateo"], satchel=True,
 )
+
+MATEO_CHILD_SPEC = dict(MATEO_SPEC)
+MATEO_CHILD_SPEC.update(sash=None, satchel=False)
 
 NPC_FISHERMAN_SPEC = dict(
     skin=PALETTE["skin_npc"], skin_shadow=PALETTE["skin_npc_shadow"],
@@ -262,12 +326,23 @@ NPC_FISHERMAN_SPEC = dict(
 )
 
 
-def draw_character(spec, direction, frame, w=16, h=24):
+def draw_character(spec, direction, frame, w=24, h=36):
+    """
+    Canvas por defecto 24x36 (escala 1.5x sobre la referencia original de 16x24 — decisión
+    revisada tras feedback visual: sprites más grandes y con transición de sombra suavizada
+    por dithering en vez de bloques planos duros, sin dejar de ser pixel art tile-based. Ver
+    ART_BIBLE_v0.1.md, "Revisión de fidelidad de personaje".
+    """
     img = new_canvas(w, h)
     s = w / 16.0
 
     def R(x0, y0, x1, y1, color):
         rect(img, int(x0 * s), int(y0 * s), int(x1 * s + s - 1), int(y1 * s + s - 1), color)
+
+    def D(x, y0, y1, color_a, color_b, width=2):
+        """Costura vertical con dithering entre dos tonos, en coordenadas de la rejilla 16px base."""
+        px0 = int(x * s)
+        dither_band(img, px0 - width // 2, int(y0 * s), px0 + (width - width // 2) - 1, int(y1 * s) - 1, color_a, color_b)
 
     leg_shift = 0
     arm_shift = 0
@@ -291,12 +366,22 @@ def draw_character(spec, direction, frame, w=16, h=24):
         R(back_x, 22, back_x + 2, 23, spec["sandal"])
         R(front_x, 22, front_x + 2, 23, spec["sandal"])
 
-    # --- Torso ---
+    # --- Torso (3 tonos: sombra/base/luz, en vez de 2 planos — mas volumen sin salir
+    # del look "flat shading" de RPG portatil, ver ART_BIBLE_v0.1.md §10) ---
     torso_top, torso_bottom = 10, 18
     R(3, torso_top, 12, torso_bottom, spec["shirt"])
     R(3, torso_top, 5, torso_bottom, spec["shirt_shadow"])
+    D(6, torso_top, torso_bottom, spec["shirt_shadow"], spec["shirt"])
+    if spec.get("shirt_highlight") and direction != "up":
+        R(10, torso_top, 11, torso_bottom - 1, spec["shirt_highlight"])
+        D(10, torso_top, torso_bottom - 1, spec["shirt"], spec["shirt_highlight"])
     if spec.get("apron"):
         R(5, torso_top + 2, 10, torso_bottom, spec["apron"])
+
+    # Faja/sash a la cintura (prompt de referencia: acento de color a la cadera)
+    if spec.get("sash") and direction != "up":
+        R(3, torso_bottom - 2, 12, torso_bottom - 1, spec["sash"])
+        R(3, torso_bottom - 1, 12, torso_bottom - 1, PALETTE.get("sash_mateo_shadow", spec["sash"]))
 
     # Brazos
     if direction == "down":
@@ -312,10 +397,32 @@ def draw_character(spec, direction, frame, w=16, h=24):
         R(arm_x, 11, arm_x + 1, 16, spec["shirt_shadow"])
         R(arm_x, 15, arm_x + 1, 16, spec["skin"])
 
+    # Bolso/satchel cruzado (prompt de referencia: correa + bolsa a la cadera).
+    # Se dibuja sobre el torso pero antes de la cabeza, y solo es visible de
+    # espaldas/perfil con claridad (de frente se simplifica a la correa en el hombro).
+    if spec.get("satchel"):
+        strap_color = PALETTE["satchel_strap"]
+        bag_color = PALETTE["satchel_bag"]
+        if direction == "down":
+            R(9, torso_top, 10, torso_top + 1, strap_color)
+            R(10, torso_bottom - 3, 13, torso_bottom, bag_color)
+        elif direction == "up":
+            R(5, torso_top, 6, torso_top + 1, strap_color)
+            R(3, torso_bottom - 3, 6, torso_bottom, bag_color)
+        elif direction == "left":
+            R(9, torso_top, 10, torso_bottom - 2, strap_color)
+            R(9, torso_bottom - 3, 12, torso_bottom, bag_color)
+        elif direction == "right":
+            R(6, torso_top, 7, torso_bottom - 2, strap_color)
+            R(4, torso_bottom - 3, 7, torso_bottom, bag_color)
+
     # --- Cabeza ---
     head_top, head_bottom = 1, 9
     R(4, head_top, 11, head_bottom, spec["skin"])
     R(4, head_top, 6, head_bottom, spec["skin_shadow"])
+    D(7, head_top, head_bottom, spec["skin_shadow"], spec["skin"])
+    if spec.get("skin_highlight") and direction == "down":
+        R(9, head_top + 1, 10, head_top + 2, spec["skin_highlight"])
 
     hair_style = spec.get("hair_style", "short")
     if direction == "up":
@@ -348,7 +455,80 @@ def draw_character(spec, direction, frame, w=16, h=24):
     return outline_silhouette(img, PALETTE["outline"])
 
 
-def build_spritesheet(spec, w=16, h=24):
+def draw_child(spec, direction, frame, w=24, h=30):
+    """
+    Variante de proporciones para la etapa 'Niñez' (~7 años, prompt de referencia del
+    usuario, CharacterVisualDefinition.AgeRange — ver ART_BIBLE_v0.1.md §4). Cabeza
+    proporcionalmente mas grande, torso y piernas mas cortos, sin sash/satchel, descalzo.
+    Reutiliza la misma paleta que el personaje adulto (misma identidad), no la misma
+    funcion de dibujo (las proporciones de un nino no son solo un escalado del adulto).
+    Canvas por defecto escalado 1.5x junto con el adulto (ver draw_character).
+    """
+    img = new_canvas(w, h)
+    s = w / 16.0
+
+    def R(x0, y0, x1, y1, color):
+        rect(img, int(x0 * s), int(y0 * s), int(x1 * s + s - 1), int(y1 * s + s - 1), color)
+
+    def D(x, y0, y1, color_a, color_b, width=2):
+        px0 = int(x * s)
+        dither_band(img, px0 - width // 2, int(y0 * s), px0 + (width - width // 2) - 1, int(y1 * s) - 1, color_a, color_b)
+
+    stride = 1 if frame == 1 else (-1 if frame == 2 else 0)
+
+    # Piernas cortas, descalzo (color piel en vez de sandalia)
+    if direction in ("down", "up"):
+        R(5, 15 + max(stride, 0), 7, 19, spec["trouser"])
+        R(9, 15 + max(-stride, 0), 11, 19, spec["trouser_shadow"])
+    else:
+        back_x, front_x = 6 - stride, 8 + stride
+        R(back_x, 15, back_x + 2, 19, spec["trouser_shadow"])
+        R(front_x, 15, front_x + 2, 19, spec["trouser"])
+
+    # Torso corto
+    torso_top, torso_bottom = 8, 15
+    R(3, torso_top, 12, torso_bottom, spec["shirt"])
+    R(3, torso_top, 5, torso_bottom, spec["shirt_shadow"])
+    D(6, torso_top, torso_bottom, spec["shirt_shadow"], spec["shirt"])
+
+    if direction == "down":
+        R(1, torso_top + 1, 2, torso_top + 5, spec["shirt_shadow"])
+        R(13, torso_top + 1, 14, torso_top + 5, spec["shirt"])
+    elif direction == "up":
+        R(1, torso_top + 1, 2, torso_top + 5, spec["shirt_shadow"])
+        R(13, torso_top + 1, 14, torso_top + 5, spec["shirt"])
+    else:
+        arm_x = 11 if direction == "right" else 1
+        R(arm_x, torso_top + 1, arm_x + 1, torso_top + 5, spec["shirt_shadow"])
+
+    # Cabeza grande (proporcion "chibi" acentuada para la etapa infantil)
+    head_top, head_bottom = 0, 8
+    R(3, head_top + 1, 12, head_bottom, spec["skin"])
+    R(3, head_top + 1, 5, head_bottom, spec["skin_shadow"])
+    D(6, head_top + 1, head_bottom, spec["skin_shadow"], spec["skin"])
+
+    if direction == "up":
+        R(2, head_top, 13, head_bottom - 2, spec["hair"])
+    else:
+        R(2, head_top, 13, head_top + 2, spec["hair"])
+        R(2, head_top, 4, head_bottom - 3, spec["hair"])
+        R(11, head_top, 13, head_bottom - 3, spec["hair"])
+        if direction == "left":
+            R(2, head_top, 7, head_bottom - 3, spec["hair"])
+        elif direction == "right":
+            R(8, head_top, 13, head_bottom - 3, spec["hair"])
+
+    if direction == "down":
+        R(5, 4, 5, 4, PALETTE["outline"])
+        R(9, 4, 9, 4, PALETTE["outline"])
+    elif direction in ("left", "right"):
+        eye_x = 6 if direction == "left" else 9
+        R(eye_x, 4, eye_x, 4, PALETTE["outline"])
+
+    return outline_silhouette(img, PALETTE["outline"])
+
+
+def build_spritesheet(spec, w=24, h=36):
     """4 direcciones x 3 frames, layout de fila = direccion (down,left,right,up), columna = frame."""
     directions = ["down", "left", "right", "up"]
     sheet = new_canvas(w * 3, h * len(directions))
@@ -359,7 +539,7 @@ def build_spritesheet(spec, w=16, h=24):
     return sheet
 
 
-def save_individual_frames(spec, name, out_dir, w=16, h=24):
+def save_individual_frames(spec, name, out_dir, w=24, h=36):
     """Exporta cada frame como PNG independiente (Mateo_17_down_0.png, ...) para que Unity
     los importe como un Sprite cada uno, sin depender de slicing de sprite-sheet en el
     importador (evita una fuente de error no verificable en este entorno sin Editor)."""
@@ -434,7 +614,7 @@ def compose_scene(tile_size=16, with_ui=False, night=False, label=None):
         post = prop_fence_post(tile_size)
         canvas.paste(post, (col * tile_size, row * tile_size), post)
 
-    char_w, char_h = tile_size, int(tile_size * 1.5)
+    char_w, char_h = int(tile_size * 1.5), int(tile_size * 2.25)
     mateo_frame = draw_character(MATEO_SPEC, "up", 1, char_w, char_h)
     mateo_pos = (8 * tile_size, 8 * tile_size - (char_h - tile_size))
     canvas.paste(mateo_frame, mateo_pos, mateo_frame)
@@ -525,8 +705,8 @@ def make_walk_cycle_gif(spec, path, preview_scale=8):
     frames = []
     for direction in ["down", "left", "up", "right"]:
         for frame in [0, 1, 0, 2]:
-            img = draw_character(spec, direction, frame, 16, 24)
-            canvas = Image.new("RGBA", (16, 24), (86, 140, 160, 255))
+            img = draw_character(spec, direction, frame, 24, 36)
+            canvas = Image.new("RGBA", (24, 36), (86, 140, 160, 255))
             canvas.paste(img, (0, 0), img)
             frames.append(upscale(canvas, preview_scale).convert("P", palette=Image.ADAPTIVE))
     frames[0].save(
@@ -550,7 +730,7 @@ def make_scene_walk_gif(path, tile_size=16, steps=10):
     for col, row in [(2, 4), (17, 3), (3, 8), (16, 7)]:
         static_bg.paste(tree, (col * tile_size, row * tile_size - tile_size), tree)
 
-    char_w, char_h = tile_size, int(tile_size * 1.5)
+    char_w, char_h = int(tile_size * 1.5), int(tile_size * 2.25)
     start_row_px, end_row_px = 5 * tile_size, 9 * tile_size
     col_px = 8 * tile_size
 

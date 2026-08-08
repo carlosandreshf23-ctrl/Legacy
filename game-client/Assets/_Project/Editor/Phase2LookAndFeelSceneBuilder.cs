@@ -32,6 +32,11 @@ namespace LegadoPeru.EditorTools
         private const string CharsRoot = "Assets/_Project/Art/Generated/Characters";
         private const int PPU = 16;
 
+        // Tamaño nativo de sprite de personaje (ver ART_BIBLE_v0.1.md — revisión de fidelidad
+        // tras feedback visual: 24x36px, escala 1.5x sobre la referencia original 16x24).
+        private const float CharacterSpriteHeightPx = 36f;
+        private const float CharacterFeetAnchorY = CharacterSpriteHeightPx / PPU / 2f; // centro del sprite -> mitad de su alto en unidades de mundo
+
         private const int Cols = 20;
         private const int Rows = 14;
         private static readonly (int min, int max) HouseCols = (5, 11);
@@ -187,7 +192,7 @@ namespace LegadoPeru.EditorTools
 
             var spriteGO = new GameObject("Sprite", typeof(SpriteRenderer));
             spriteGO.transform.SetParent(go.transform, false);
-            spriteGO.transform.localPosition = new Vector3(0f, 0.75f, 0f); // ancla pies a la base del tile
+            spriteGO.transform.localPosition = new Vector3(0f, CharacterFeetAnchorY, 0f); // ancla pies a la base del tile
             var renderer = spriteGO.GetComponent<SpriteRenderer>();
             renderer.sortingOrder = 5;
 
@@ -208,7 +213,7 @@ namespace LegadoPeru.EditorTools
 
             var spriteGO = new GameObject("Sprite", typeof(SpriteRenderer));
             spriteGO.transform.SetParent(go.transform, false);
-            spriteGO.transform.localPosition = new Vector3(0f, 0.75f, 0f);
+            spriteGO.transform.localPosition = new Vector3(0f, CharacterFeetAnchorY, 0f);
             spriteGO.GetComponent<SpriteRenderer>().sortingOrder = 4;
             spriteGO.GetComponent<SpriteRenderer>().sprite = LoadSprite($"{CharsRoot}/NPC_Fisherman", "NPC_Fisherman_down_0");
 
