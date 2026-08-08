@@ -25,8 +25,10 @@ namespace LegadoPeru.UI
         public List<MapMarker> markers = new List<MapMarker>();
         public RectTransform playerMarker;
         public RectTransform mapArea;
-        public Vector2 worldOriginXZ;
-        public Vector2 worldSizeXZ = new Vector2(400f, 400f);
+
+        [Tooltip("Esquina inferior-izquierda del area jugable, en unidades de mundo (X,Y — plano cenital 2D).")]
+        public Vector2 worldOriginXY;
+        public Vector2 worldSizeXY = new Vector2(20f, 14f);
 
         private void OnEnable()
         {
@@ -50,8 +52,8 @@ namespace LegadoPeru.UI
             if (!ServiceLocator.TryGet(out PlayerCharacterController player)) return;
 
             Vector2 normalized = new Vector2(
-                (player.transform.position.x - worldOriginXZ.x) / Mathf.Max(0.01f, worldSizeXZ.x),
-                (player.transform.position.z - worldOriginXZ.y) / Mathf.Max(0.01f, worldSizeXZ.y));
+                (player.transform.position.x - worldOriginXY.x) / Mathf.Max(0.01f, worldSizeXY.x),
+                (player.transform.position.y - worldOriginXY.y) / Mathf.Max(0.01f, worldSizeXY.y));
 
             playerMarker.anchoredPosition = new Vector2(
                 normalized.x * mapArea.rect.width,

@@ -1,6 +1,7 @@
 using LegadoPeru.Calendar;
 using LegadoPeru.Characters;
 using LegadoPeru.Core;
+using LegadoPeru.Narrative;
 using LegadoPeru.World;
 using UnityEngine;
 using UnityEngine.UI;
@@ -8,8 +9,10 @@ using UnityEngine.UI;
 namespace LegadoPeru.UI
 {
     /// <summary>
-    /// Panel de debug activable/desactivable (prompt §25): GameDate, GameTime, posición,
-    /// FPS, CurrentLocationId. No es UI final de jugador.
+    /// Development Mode panel (prompt Fase 1 §25 y Fase 2 §42): CurrentDate, CurrentLocation,
+    /// CharacterID, FamilyID, FPS, DecisionCount, VisitedLocations. ActiveQuest se deja
+    /// preparado ("—") hasta que exista QuestGraph (07_CONSEQUENCE_SYSTEM.md, fase posterior).
+    /// Nunca debe incluirse en una build comercial (prompt §44).
     /// </summary>
     public class DebugPanelController : MonoBehaviour
     {
@@ -42,15 +45,34 @@ namespace LegadoPeru.UI
 
             var calendar = ServiceLocator.TryGet(out GameCalendarSystem cal) ? cal.CurrentDate.ToString() : "-";
             var locationId = ServiceLocator.TryGet(out LocationSystem loc) ? loc.CurrentLocationId : "-";
-            var position = ServiceLocator.TryGet(out PlayerCharacterController player)
-                ? player.transform.position.ToString("F1")
-                : "-";
+
+            string characterId = "-", familyId = "-", position = "-";
+            if (ServiceLocator.TryGet(out PlayerCharacterController player))
+            {
+                characterId = player.characterId;
+                familyId = player.familyId;
+                position = player.transform.position.ToString("F1");
+            }
+
+            int decisionCount = ServiceLocator.TryGet(out DecisionService decisions) ? decisions.Records.Count : 0;
+            int visitedCount = 0;
+            if (ServiceLocator.TryGet(out DiscoverySystem discovery))
+            {
+                foreach (var entry in discovery.CaptureState())
+                    if (entry.state == DiscoveryState.Visited) visitedCount++;
+            }
 
             contentText.text =
+                $"{BuildInfo.DisplayString}\n" +
                 $"GameDate: {calendar}\n" +
                 $"FPS: {fps:F0}\n" +
                 $"Position: {position}\n" +
-                $"Location: {locationId}";
+                $"Location: {locationId}\n" +
+                $"CharacterID: {characterId}\n" +
+                $"FamilyID: {familyId}\n" +
+                $"ActiveQuest: — (QuestGraph pendiente)\n" +
+                $"DecisionCount: {decisionCount}\n" +
+                $"VisitedLocations: {visitedCount}";
         }
 
         public void Toggle()

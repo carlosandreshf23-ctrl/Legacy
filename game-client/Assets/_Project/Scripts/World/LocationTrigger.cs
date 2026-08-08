@@ -3,8 +3,8 @@ using UnityEngine;
 
 namespace LegadoPeru.World
 {
-    /// <summary>Volumen de trigger que marca la entrada del jugador a una LocationDefinition.</summary>
-    [RequireComponent(typeof(Collider))]
+    /// <summary>Volumen de trigger 2D que marca la entrada del jugador a una LocationDefinition.</summary>
+    [RequireComponent(typeof(Collider2D))]
     public class LocationTrigger : MonoBehaviour
     {
         [SerializeField] private LocationDefinition location;
@@ -13,11 +13,11 @@ namespace LegadoPeru.World
 
         private void Reset()
         {
-            var col = GetComponent<Collider>();
+            var col = GetComponent<Collider2D>();
             if (col != null) col.isTrigger = true;
         }
 
-        private void OnTriggerEnter(Collider other)
+        private void OnTriggerEnter2D(Collider2D other)
         {
             if (!other.CompareTag("Player") || location == null) return;
             if (ServiceLocator.TryGet(out LocationSystem locationSystem))

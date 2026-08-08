@@ -13,7 +13,7 @@ namespace LegadoPeru.Interaction
     [DefaultExecutionOrder(-50)]
     public class InteractionSystem : MonoBehaviour
     {
-        [SerializeField] private float interactionRadius = 2.5f;
+        [SerializeField] private float interactionRadius = 1.5f;
         [SerializeField] private LayerMask interactableMask = ~0;
 
         private IInteractable current;
@@ -38,7 +38,9 @@ namespace LegadoPeru.Interaction
 
         private IInteractable FindBestInteractable()
         {
-            Collider[] hits = Physics.OverlapSphere(transform.position, interactionRadius, interactableMask);
+            // Fisica 2D (prompt Fase 2 §16): la exploracion es cenital, no hay tercera
+            // dimension de gameplay, asi que el radio de interaccion es un circulo en XY.
+            Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, interactionRadius, interactableMask);
             IInteractable nearest = null;
             float nearestSqrDist = float.MaxValue;
 
@@ -47,7 +49,7 @@ namespace LegadoPeru.Interaction
                 var interactable = hit.GetComponentInParent<IInteractable>();
                 if (interactable == null || !interactable.CanInteract) continue;
 
-                float sqrDist = (hit.transform.position - transform.position).sqrMagnitude;
+                float sqrDist = ((Vector2)hit.transform.position - (Vector2)transform.position).sqrMagnitude;
                 if (sqrDist < nearestSqrDist)
                 {
                     nearestSqrDist = sqrDist;
