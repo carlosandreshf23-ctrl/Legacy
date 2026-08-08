@@ -23,7 +23,7 @@ namespace LegadoPeru.Tests
             {
                 saveVersion = 1,
                 savedAtIso = "2026-08-08T00:00:00Z",
-                player = new PlayerStateDto { posX = 1f, posY = 2f, posZ = 3f, rotY = 45f },
+                player = new PlayerStateDto { posX = 1f, posY = 2f, posZ = 3f, facing = "left" },
                 worldDate = new WorldDate(1820, 9, 1, 10, 30),
                 currentLocationId = "Prototype_Path",
                 inventory = new List<ItemStack> { new ItemStack { itemId = "ITEM_PROVISIONS", quantity = 2 } },
