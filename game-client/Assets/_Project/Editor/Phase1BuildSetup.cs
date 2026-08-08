@@ -22,15 +22,22 @@ namespace LegadoPeru.EditorTools
             Debug.Log("[Legado] Build Settings actualizado: MainMenu (0), Sandbox_1820_Prototype (1).");
         }
 
+        /// <summary>
+        /// Desde Fase 2 el Sandbox se reconstruye en 2D (Phase2LookAndFeelSceneBuilder,
+        /// pixel art real) en vez del blockout 3D de Fase 1 (retirado, prompt Fase 2 §16).
+        /// Este método conserva el nombre/menú de Fase 1 por continuidad, pero ahora encadena
+        /// el pipeline de arte + la escena 2D. Ver Legado/Fase 2 para los pasos individuales.
+        /// </summary>
         [MenuItem("Legado/Fase 1/0. Build Everything (Content + Scenes + Build Settings)")]
         public static void BuildEverything()
         {
             Phase1ContentSeeder.SeedContent();
-            Phase1SandboxSceneBuilder.Build();
+            Phase2ArtImportSetup.ConfigureImportedArt();
+            Phase2LookAndFeelSceneBuilder.Build();
             Phase1MainMenuSceneBuilder.Build();
             AddScenesToBuildSettings();
 
-            Debug.Log("[Legado] Fase 1: contenido + escenas + build settings generados. Abre MainMenu.unity y presiona Play.");
+            Debug.Log("[Legado] Contenido + arte + escenas 2D + build settings generados. Abre MainMenu.unity y presiona Play.");
         }
     }
 }
