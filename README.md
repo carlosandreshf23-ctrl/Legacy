@@ -6,7 +6,8 @@ Este repositorio se desarrolla por **fases funcionales** (vertical slices): cada
 
 ## Estado del proyecto
 
-**Fase 0 — Arquitectura del Proyecto** (en curso). Aún no existe cliente jugable; esta fase define la base técnica.
+**Fase 0 — Arquitectura del Proyecto**: completa.
+**Fase 1 — Fundación Jugable**: código completo (ver [`game-client/PHASE_01_IMPLEMENTATION.md`](game-client/PHASE_01_IMPLEMENTATION.md)), pendiente de compilar/ejecutar y validar en un entorno con Unity Editor real — este entorno de desarrollo no tiene Unity/.NET instalado, ver limitación documentada en ese archivo §0.
 
 ## Documentación
 
@@ -30,7 +31,7 @@ Este repositorio se desarrolla por **fases funcionales** (vertical slices): cada
 
 ```
 docs/            Documentación de arquitectura y diseño
-game-client/     Proyecto Unity (cliente) — se inicializa en Fase 1
+game-client/     Proyecto Unity (cliente) — código de Fase 1, ver game-client/PHASE_01_IMPLEMENTATION.md
 backend/         Servicio de mundo persistente — se introduce en Fase 8-9
 tools/           Herramientas de soporte (validación de datos, CI)
 ```
