@@ -3,6 +3,15 @@
 **Fase:** 1 — Fundación Jugable
 **Estado:** código completo, **no compilado ni ejecutado por el agente** (ver §0, limitación crítica del entorno).
 
+> **Nota de Fase 2 (pivote de dirección artística):** a partir de Fase 2 el proyecto es un
+> RPG 2D cenital en pixel art, no 3D. La cámara en tercera persona y el `CharacterMotor`
+> basado en `CharacterController` descritos en este documento fueron **retirados y
+> reemplazados** por `PixelPerfectCamera2D` y un `CharacterMotor` basado en `Rigidbody2D`.
+> `Phase1SandboxSceneBuilder.cs` (escena de bloques 3D) fue eliminado y sustituido por
+> `Phase2LookAndFeelSceneBuilder.cs`. El resto de sistemas descritos aquí (guardado,
+> inventario, diálogo, decisiones, calendario, UI) siguen vigentes sin cambios de fondo.
+> Ver `game-client/ART_BIBLE_v0.1.md` y `game-client/PROGRESS.md` para el detalle vigente.
+
 ---
 
 ## 0. Limitación crítica del entorno de desarrollo (leer primero)

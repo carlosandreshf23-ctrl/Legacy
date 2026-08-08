@@ -8,6 +8,7 @@ Este repositorio se desarrolla por **fases funcionales** (vertical slices): cada
 
 **Fase 0 — Arquitectura del Proyecto**: completa.
 **Fase 1 — Fundación Jugable**: código completo (ver [`game-client/PHASE_01_IMPLEMENTATION.md`](game-client/PHASE_01_IMPLEMENTATION.md)), pendiente de compilar/ejecutar y validar en un entorno con Unity Editor real — este entorno de desarrollo no tiene Unity/.NET instalado, ver limitación documentada en ese archivo §0.
+**Fase 2 — Primer Vertical Slice Visual**: dirección artística definitiva fijada (RPG 2D pixel-art cenital). Milestone 2.1 (Look & Feel) completo — ver [`game-client/ART_BIBLE_v0.1.md`](game-client/ART_BIBLE_v0.1.md) y [`game-client/PROGRESS.md`](game-client/PROGRESS.md). Detenido a la espera de aprobación visual antes de continuar con Milestone 2.2.
 
 ## Documentación
 
