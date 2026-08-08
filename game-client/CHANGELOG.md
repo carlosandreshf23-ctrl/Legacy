@@ -2,6 +2,22 @@
 
 Formato libre, agrupado por build (prompt Fase 2 §46). Versionado: `MAJOR.PHASE.MILESTONE-dev` (ver §45 del prompt Fase 2 y `BuildInfo.cs`).
 
+## BUILD 0.2.2-dev — Phase 2, Milestone 2.1 (iteración de fidelidad visual)
+
+Iteración sobre el mismo milestone tras feedback visual directo del usuario (no un milestone nuevo).
+
+### Added
+- `dither_band()` en el pipeline de arte: transición de sombra con patrón de tablero (ordered dithering) en vez de borde duro de 2 tonos.
+- Tercer tono (highlight) en piel/camisa/cabello de Mateo; accesorios nuevos: faja/sash y bolso/satchel cruzado.
+- `draw_child()`: etapa "Niñez" (~7 años) de Mateo, proporción chibi acentuada — primera prueba visual del sistema de envejecimiento (`CharacterVisualDefinition`, ver ART_BIBLE §4).
+- Iconos de detalle de item (`icon_satchel`, `icon_sash`, `icon_family_seal`).
+- `tools/art-pipeline/generate_design_sheet_and_town.py`: hoja de diseño de personaje (`06_character_design_sheet.png`) y mockup de pueblo ampliado con segundo edificio, pozo, arbustos y 3 NPC diferenciados (`07_pueblo_ampliado.png`).
+- `ART_PROMPTS_EXTERNAL_AI.md`: prompts de referencia para producir arte de mayor fidelidad con un generador de imágenes externo (ruta alternativa a este pipeline programático).
+
+### Changed
+- Tamaño nativo de sprite de personaje: 16×24 → **24×36** (adulto), 24×30 (niño) — decisión revisada explícitamente en `ART_BIBLE_v0.1.md` (sigue siendo pixel art tile-based; el tile de mundo permanece en 16×16, no cambió la técnica, solo la fidelidad del personaje).
+- `Phase2LookAndFeelSceneBuilder.cs`: ancla de pies del sprite recalculada para el nuevo tamaño (`CharacterFeetAnchorY`).
+
 ## BUILD 0.2.1-dev — Phase 2, Milestone 2.1 (Look & Feel)
 
 ### Added

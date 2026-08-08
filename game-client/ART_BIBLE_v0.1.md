@@ -25,9 +25,20 @@ Referencia de sensación (**no de copia**, prompt Fase 2 — leer antes de nada)
 | Rendimiento (relevante para móvil gama baja, ver `10_MOBILE_PERFORMANCE.md`) | ✅ Texturas más pequeñas, más tiles por atlas, menos memoria por escena | Mayor huella de memoria por la misma área de mundo |
 | Producción sostenible (un tile menos "espacio" que rellenar de detalle por pieza) | ✅ Más rápido de producir de forma consistente | Cada pieza exige más decisiones de detalle |
 
-**Personajes**: 16 px de ancho × 24 px de alto (1 tile de ancho × 1.5 tiles de alto, dentro del rango pedido por el prompt §2). Se probó también un personaje de 32×48 (upscale 2x de la misma silueta, ver comparación) únicamente para validar cobertura de pantalla, no como diseño independiente — si en el futuro se decide producir contenido a 32px, se rediseñaría con detalle propio, no solo escalando.
+**Personajes: 24 px de ancho × 36 px de alto** (revisado — ver "Revisión de fidelidad de personaje" más abajo). Equivale a 1.5 tiles de ancho × 2.25 tiles de alto a PPU=16; ligeramente por encima del rango original del prompt (1-2 tiles de alto) por decisión deliberada de legibilidad, aprobada explícitamente tras feedback visual. El **mundo** (tiles de terreno/construcción) se mantiene en 16×16 — solo el personaje creció, el tile no.
 
-**Pixels Per Unit en Unity: 16.** 1 unidad de mundo = 1 tile = 16 px nativos.
+**Pixels Per Unit en Unity: 16.** 1 unidad de mundo = 1 tile = 16 px nativos. (El personaje usa el mismo PPU; su sprite ocupa más de 1 unidad porque su canvas nativo es más grande, no porque tenga un PPU distinto — evita tener que gestionar dos escalas de importación).
+
+### Revisión de fidelidad de personaje (post Milestone 2.1, antes de aprobar 2.2)
+
+Tras mostrar el primer mockup, feedback del usuario: quería algo más cercano a una referencia con acabado "moderno" (sombreado suave, más detalle) y explícitamente **no** quería alejarse de la técnica pixel-art declarada como definitiva en el prompt de Fase 2. Decisión resultante (y única aplicada — se descartaron tanto "dejar igual" como "abandonar pixel art por completo"):
+
+1. **Sprite 1.5x más grande**: de 16×24 a 24×36 nativos. Más espacio de trabajo por personaje sin cambiar el tile de mundo.
+2. **Dithering en las costuras sombra/base** (`dither_band()` en el pipeline): en vez de un borde duro de 2 tonos, una franja de 2px con patrón de tablero mezclando ambos tonos — técnica real de "pixel art moderno" (Eastward, Stardew Valley) que rompe el look de "bloque plano" sin introducir gradientes suaves ni salir de una paleta indexada.
+3. **Tercer tono** (highlight) en piel/camisa/cabello, y accesorios nuevos (faja/sash, bolso/satchel cruzado) que añaden quiebres de silueta y color.
+4. **No se tocó**: perspectiva cenital, tile de mundo a 16px, animación por frames (no interpolada), outline de silueta. La técnica sigue siendo 100% pixel art tile-based — el ajuste fue de detalle/fidelidad, no de dirección.
+
+Techo de calidad reconocido: esto sigue sin acercarse al acabado pictórico de una referencia generada por IA de imágenes; es la mejora máxima razonable dentro de un pipeline programático (Python/Pillow) dibujando rectángulos. Ver `ART_PROMPTS_EXTERNAL_AI.md` para la vía de producción de arte de mayor fidelidad si se decide usarla más adelante.
 
 ## 3. Pixel perfect (prompt §17)
 
@@ -116,7 +127,8 @@ No se aplica ningún filtro global por año. Los cambios entre 1821 y 1920 (Mile
 |---|---|
 | Tile de terreno (suelo/camino/arena/agua) | 16×16 px |
 | Tile de construcción (pared/techo/puerta) | 16×16 px |
-| Personaje (bounding box) | 16×24 px |
+| Personaje adulto (bounding box) | 24×36 px (revisado, ver §4) |
+| Personaje niño (bounding box) | 24×30 px |
 | Árbol | 32×32 px (prop, no tile) |
 | Poste/cerca | 16×16 px (prop delgado) |
 

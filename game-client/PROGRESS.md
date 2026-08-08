@@ -23,6 +23,10 @@ FASE 2 — PRIMER VERTICAL SLICE VISUAL (Pisco/Paracas, sept. 1820)
 ✓ UI mínima (prompt de interacción) integrada en la escena 2D
 ✓ Mockups visuales compuestos a partir del pixel art real (vista general, personaje+NPC, diálogo, comparación de escala, variante nocturna) + 2 GIFs de animación
 ✓ Cámara 3D de Fase 1 retirada por completo (prompt §16)
+✓ Iteración de fidelidad de personaje (feedback visual del usuario): sprite 1.5x más grande (24×36), dithering en costuras de sombra, tercer tono, faja + bolso, etapa "Niñez" (~7 años) como prueba del sistema de envejecimiento visual
+✓ Hoja de diseño de personaje ("character design sheet") con ambas etapas, ciclos de caminata y detalle de items
+✓ Mockup de pueblo ampliado (segundo edificio con paleta distinta, pozo, arbustos, 3 NPC diferenciados) — validación de variedad arquitectónica sin copiar Littleroot Town ni ningún otro mapa existente
+✓ `ART_PROMPTS_EXTERNAL_AI.md`: vía de producción de arte de mayor fidelidad con generador de imágenes externo, para cuando se decida usarla
 
 ## EN DESARROLLO
 
@@ -57,6 +61,7 @@ FASE 2 — PRIMER VERTICAL SLICE VISUAL (Pisco/Paracas, sept. 1820)
 
 `Progress/Phase_02/Milestone_01/`:
 - `01_vista_general.png`, `02_personaje_y_npc.png`, `03_interfaz_dialogo.png`, `04_comparacion_escala_tiles.png`, `05_variante_nocturna.png`
+- `06_character_design_sheet.png` (hoja de diseño Niñez/Juventud), `07_pueblo_ampliado.png` (mockup con 2 edificios + pozo + 3 NPC)
 - `mateo_walk_cycle.gif`, `mateo_scene_walk.gif`
 
 Nota de honestidad (ver `PHASE_01_IMPLEMENTATION.md` §0): estas imágenes son **mockups compuestos a partir del pixel art real** (generado por `tools/art-pipeline/generate_milestone_2_1_assets.py`), no capturas del motor Unity en ejecución — este entorno de desarrollo no tiene Unity Editor disponible. El código de la escena jugable (`Phase2LookAndFeelSceneBuilder.cs`) usa exactamente estos mismos assets con el mismo layout, así que lo que se vería al ejecutar el proyecto en Unity debería coincidir visualmente con estos mockups, pero eso está pendiente de confirmación real.
